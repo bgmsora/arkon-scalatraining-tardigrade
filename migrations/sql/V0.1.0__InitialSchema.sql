@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "postgis";
+
 DROP TABLE IF EXISTS comercial_activity;
 
 CREATE TABLE comercial_activity (
@@ -35,3 +37,6 @@ CREATE TABLE shop (
     , position GEOGRAPHY (POINT) NOT NULL
 );
 
+--Algunos ejemplos de prueba
+--COPY city (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position) FROM stdin;
+--34183	AUTOLAVADO_OSWALDO	

@@ -31,3 +31,10 @@ build
 
 #general
 *.class
+
+#Enviroment
+.env
+
+#More
+.bsp
+.bloop
