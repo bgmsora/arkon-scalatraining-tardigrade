@@ -6,32 +6,30 @@ package demo.schema
 
 import cats.effect.Async
 import cats.effect.std.Dispatcher
-import sangria.schema.{Field, ListType, ObjectType, Schema, fields}
+import sangria.schema.{ fields, Field, ListType, ObjectType, Schema }
 import demo.repo.MasterRepo
 
 object QueryType {
-  def apply[F[_]: Async]: ObjectType[MasterRepo[F], Unit] =
+
+  def apply[F[_]: Async](dispatcher: Dispatcher[F]): ObjectType[MasterRepo[F], Unit] =
     ObjectType(
       name = "Query",
       fields = fields(
         Field(
-          name = "activities",
+          name      = "activities",
           fieldType = ListType(ActivityType[F]),
-          resolve = c => c.ctx.activity.fetchAll.toIO.unsafeToFuture
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.activity.fetchAll)
         ),
         Field(
-          name = "shopTypes",
+          name      = "shopTypes",
           fieldType = ListType(ShopTypeType[F]),
-          resolve = c => c.ctx.shopType.fetchAll.toIO.unsafeToFuture
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.shopType.fetchAll)
         ),
         Field(
-          name = "stratums",
+          name      = "stratums",
           fieldType = ListType(StratumType[F]),
-          resolve = c => c.ctx.stratum.fetchAll.toIO.unsafeToFuture
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.stratum.fetchAll)
         )
       )
     )
-
-  def schema[F[_]: Async]: Schema[MasterRepo[F], Unit] =
-    Schema(QueryType[F])
 }

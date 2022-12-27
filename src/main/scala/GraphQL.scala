@@ -4,7 +4,7 @@
 
 package demo
 
-import io.circe.{Json, JsonObject}
+import io.circe.{ Json, JsonObject }
 
 /** An algebra of operations in F that evaluate GraphQL requests. */
 trait GraphQL[F[_]] {
@@ -30,9 +30,9 @@ trait GraphQL[F[_]] {
     * @return either an error Json or result Json
     */
   def query(
-      query: String,
-      operationName: Option[String],
-      variables: JsonObject
+    query: String,
+    operationName: Option[String],
+    variables: JsonObject
   ): F[Either[Json, Json]]
 
 }

@@ -4,51 +4,6 @@
 
 package demo
 
-/*
-import cats.effect._
-import cats.implicits._
-import doobie.Transactor
-import doobie.hikari.HikariTransactor
-import doobie.util.ExecutionContexts
-import org.http4s.dsl.Http4sDsl
-import org.http4s.headers.Location
-import org.http4s.implicits._
-import org.http4s.server.Server
-import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.{HttpRoutes, StaticFile, Uri}
-//import sangria.schema.Schema
-import demo.sangria.SangriaGraphQL
-import demo.repo.MasterRepo
-import demo.schema.{QueryType, WorldDeferredResolver}
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContext.global
- */
-
-/*
-import cats.effect._
-import cats.implicits._
-import demo.sangria.SangriaGraphQL
-import demo.schema._
-import doobie._
-import doobie.hikari._
-import doobie.util.ExecutionContexts
-//import io.chrisdavenport.log4cats.Logger
-//import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
-import repo._
-import sangria._
-import _root_.sangria.schema._
-import org.http4s._
-import org.http4s.dsl._
-import org.http4s.headers.Location
-import org.http4s.implicits._
-import org.http4s.server.Server
-import org.http4s.server.blaze._
-import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContext.global
- */
-
-import demo.sangria.SangriaGraphQL
 import demo.schema._
 import repo._
 import sangria._
@@ -66,11 +21,11 @@ import org.http4s.circe._
 import org.http4s.dsl._
 import org.http4s.ember.server._
 import org.http4s.server._
-import sangria.schema.Schema
 
 object Main extends IOApp {
   //Add
   implicit val executionContext = unsafe.IORuntime.global.compute
+
   // Construct a transactor for connecting to the database.
   def transactor[F[_]: Async]: Resource[F, HikariTransactor[F]] =
     for {
@@ -85,28 +40,25 @@ object Main extends IOApp {
     } yield ht
 
   // Construct a GraphQL implementation based on our Sangria definitions.
-  def graphQL[F[_]: Async](
-    transactor: Transactor[F]
-  ): GraphQL[F] =
-    SangriaGraphQL[F](
-      Schema(
-        query = QueryType[F]
-      ),
-      WorldDeferredResolver[F],
-      MasterRepo.fromTransactor(transactor).pure[F]
+  def graphQL[F[_]: Async](dispatcher: Dispatcher[F], transactor: Transactor[F]): WorldDeferredResolver[F] =
+    WorldDeferredResolver[F](
+      Schema(query = QueryType[F](dispatcher)),
+      MasterRepo.fromTransactor(transactor).pure[F],
+      executionContext
     )
 
-  // Playground or else redirect to playground
-  def playgroundOrElse[F[_]: Async]: HttpRoutes[F] = {
-    object dsl extends Http4sDsl[F]; import dsl._
-    HttpRoutes.of[F] {
-      case request @ GET -> Root / "playground.html" =>
-        StaticFile
-          .fromResource[F]("/assets/playground.html", Some(request))
-          .getOrElseF(NotFound())
+  def graphRoutes[F[_]: Async](graph: WorldDeferredResolver[F]): HttpRoutes[F] = {
+    object Dsl extends Http4sDsl[F]
+    import Dsl._
 
-      case _ =>
-        PermanentRedirect(Location(Uri.uri("/playground.html")))
+    HttpRoutes.of[F] {
+      case request @ GET -> Root / "graph" =>
+        StaticFile fromResource ("/assets/playground.html", Some(request)) getOrElseF (NotFound())
+      case request @ POST -> Root / "graph" =>
+        request.as[Json].flatMap(graph.parse).flatMap {
+          case Right(json) => Ok(json)
+          case Left(json)  => BadRequest(json)
+        }
     }
   }
 
@@ -114,17 +66,20 @@ object Main extends IOApp {
   def server[F[_]: Async](
     routes: HttpRoutes[F]
   ): Resource[F, Server] =
-    BlazeServerBuilder[F](global)
-      .bindHttp(8080, "localhost")
+    EmberServerBuilder
+      .default[F]
+      .withHost(ipv4"0.0.0.0")
+      .withPort(port"8080")
       .withHttpApp(routes.orNotFound)
-      .resource
+      .build
 
   // Resource that constructs our final server.
   def resource[F[_]: Async]: Resource[F, Server] =
     for {
+      d  <- Dispatcher[F]
       xa <- transactor[F]
-      gql = graphQL[F](xa)
-      rts = GraphQLRoutes[F](gql) <+> playgroundOrElse(b)
+      gql = graphQL[F](d, xa)
+      rts = graphRoutes[F](gql)
       svr <- server[F](rts)
     } yield svr
 

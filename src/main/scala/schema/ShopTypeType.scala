@@ -5,27 +5,28 @@
 package demo.schema
 
 import cats.effect.Async
-import sangria.schema.{Field, IntType, ObjectType, StringType, fields}
+import sangria.schema.{ fields, Field, IntType, ObjectType, StringType }
 import demo.model.ShopType
 import demo.repo.MasterRepo
 
 object ShopTypeType {
+
   def apply[F[_]: Async]: ObjectType[MasterRepo[F], ShopType] =
     ObjectType(
       name = "ShopType",
       fieldsFn = () =>
         fields(
           Field(
-            name = "id",
-            fieldType = IntType,
+            name        = "id",
+            fieldType   = IntType,
             description = Some("Shop type id."),
-            resolve = _.value.id
+            resolve     = _.value.id
           ),
           Field(
-            name = "name",
-            fieldType = StringType,
+            name        = "name",
+            fieldType   = StringType,
             description = Some("Shop type name."),
-            resolve = _.value.name
+            resolve     = _.value.name
           )
         )
     )
