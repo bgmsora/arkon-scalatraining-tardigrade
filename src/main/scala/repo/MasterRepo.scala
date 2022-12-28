@@ -10,7 +10,8 @@ import doobie._
 final case class MasterRepo[F[_]](
   activity: ActivityRepo[F],
   shopType: ShopTypeRepo[F],
-  stratum: StratumRepo[F]
+  stratum: StratumRepo[F],
+  shop: ShopRepo[F],
 )
 
 object MasterRepo {
@@ -19,6 +20,7 @@ object MasterRepo {
     MasterRepo(
       ActivityRepo.fromTransactor(xa),
       ShopTypeRepo.fromTransactor(xa),
-      StratumRepo.fromTransactor(xa)
+      StratumRepo.fromTransactor(xa),
+      ShopRepo.fromTransactor(xa),
     )
 }

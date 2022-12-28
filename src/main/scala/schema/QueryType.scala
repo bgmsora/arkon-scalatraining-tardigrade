@@ -6,7 +6,7 @@ package demo.schema
 
 import cats.effect.Async
 import cats.effect.std.Dispatcher
-import sangria.schema.{ fields, Field, ListType, ObjectType, Schema, StringType , Argument, OptionType}
+import sangria.schema.{ fields, Argument, Field, ListType, ObjectType, OptionType, Schema, StringType, IDType}
 import demo.repo.MasterRepo
 
 object QueryType {
@@ -48,6 +48,17 @@ object QueryType {
           fieldType = OptionType(ActivityType[F]),
           resolve   = c => dispatcher.unsafeToFuture(c.ctx.activity.fetchById(c arg Id)),
           arguments = List(Id)
+        ),
+        Field(
+          name      = "shopById",
+          fieldType = OptionType(ShopType[F](dispatcher)),
+          resolve = c => dispatcher.unsafeToFuture(c.ctx.shop.fetchById(c arg Id)),
+          arguments = List(Id)
+        ),
+        Field(
+          name      = "shops",
+          fieldType = ListType(ShopType[F](dispatcher)),
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.shop.fetchAll)
         )
       )
     )

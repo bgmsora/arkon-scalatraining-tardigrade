@@ -5,16 +5,16 @@
 package demo.model
 
 final case class Shop(
-  id: Int,
-  activity: Activity,
+  id: String,
   address: String,
-  email: String,
   businessName: String,
-  lat: Float,
-  long: Float,
+  email: String,
+  lat: Double,
+  long: Double,
   name: String,
   phoneNumber: String,
-  shopType: ShopType,
-  stratum: Stratum,
-  website: String
+  website: String,
+  activityId: String,
+  shopTypeId: String,
+  stratumId: String
 )
