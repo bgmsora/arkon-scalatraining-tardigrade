@@ -27,6 +27,8 @@ object Main extends IOApp {
   implicit val executionContext = unsafe.IORuntime.global.compute
 
   // Construct a transactor for connecting to the database.
+  /*
+  //No se porque razon no me permitia conectarme de esta forma
   def transactor[F[_]: Async]: Resource[F, HikariTransactor[F]] =
     for {
       ec <- ExecutionContexts.fixedThreadPool[F](32)
@@ -34,7 +36,19 @@ object Main extends IOApp {
               "org.postgresql.Driver",
               s"jdbc:postgresql:${System.getenv("DB_DATABASE")}",
               System.getenv("DB_USER"),
-              System.getenv("DB_PASS"),
+              System.getenv("DB_PASSWORD"),
+              ec
+            )
+    } yield ht
+  */
+   def transactor[F[_]: Async]: Resource[F, HikariTransactor[F]] =
+    for {
+      ec <- ExecutionContexts.fixedThreadPool[F](32)
+      ht <- HikariTransactor.newHikariTransactor[F](
+              "org.postgresql.Driver",
+              "jdbc:postgresql:training",
+              "user",
+              "password",
               ec
             )
     } yield ht

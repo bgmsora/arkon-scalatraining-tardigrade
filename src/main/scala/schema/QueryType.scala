@@ -6,10 +6,11 @@ package demo.schema
 
 import cats.effect.Async
 import cats.effect.std.Dispatcher
-import sangria.schema.{ fields, Field, ListType, ObjectType, Schema }
+import sangria.schema.{ fields, Field, ListType, ObjectType, Schema, StringType , Argument, OptionType}
 import demo.repo.MasterRepo
 
 object QueryType {
+  val Id = Argument("id", StringType)
 
   def apply[F[_]: Async](dispatcher: Dispatcher[F]): ObjectType[MasterRepo[F], Unit] =
     ObjectType(
@@ -29,6 +30,24 @@ object QueryType {
           name      = "stratums",
           fieldType = ListType(StratumType[F]),
           resolve   = c => dispatcher.unsafeToFuture(c.ctx.stratum.fetchAll)
+        ),
+        Field(
+          name      = "stratumsById",
+          fieldType = OptionType(StratumType[F]),
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.stratum.fetchById(c arg Id)),
+          arguments = List(Id)
+        ),
+        Field(
+          name      = "shopTypesById",
+          fieldType = OptionType(ShopTypeType[F]),
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.shopType.fetchById(c arg Id)),
+          arguments = List(Id)
+        ),
+        Field(
+          name      = "activitiesById",
+          fieldType = OptionType(ActivityType[F]),
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.activity.fetchById(c arg Id)),
+          arguments = List(Id)
         )
       )
     )
