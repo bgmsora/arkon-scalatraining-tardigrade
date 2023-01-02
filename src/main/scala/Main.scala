@@ -22,6 +22,8 @@ import org.http4s.dsl._
 import org.http4s.ember.server._
 import org.http4s.server._
 
+import org.http4s.blaze.client.BlazeClientBuilder
+
 object Main extends IOApp {
   //Add
   implicit val executionContext = unsafe.IORuntime.global.compute
@@ -81,6 +83,7 @@ object Main extends IOApp {
       gql = graphQL[F](d, xa)
       rts = graphRoutes[F](gql)
       svr <- server[F](rts)
+      client <- BlazeClientBuilder[F].resource
     } yield svr
 
   // Our entry point starts the server and blocks forever.

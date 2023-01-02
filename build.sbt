@@ -8,6 +8,9 @@ libraryDependencies ++= Seq(
   "io.circe"            %% "circe-generic"         % "0.14.2",
   "io.circe"            %% "circe-literal"         % "0.14.2",
   "io.circe"            %% "circe-optics"          % "0.14.1",
+  "io.circe"            %% "circe-core"            % "0.14.1",
+  "io.circe"            %% "circe-parser"          % "0.14.1",
+  "io.circe"            %% "circe-derivation"      % "0.13.0-M5",
   "org.http4s"          %% "http4s-dsl"            % "0.23.13",
   "org.http4s"          %% "http4s-ember-server"   % "0.23.13",
   "org.http4s"          %% "http4s-ember-client"   % "0.23.13",
@@ -22,5 +25,8 @@ libraryDependencies ++= Seq(
   "net.postgis"          % "postgis-jdbc"          % "2.3.0",
   "org.sangria-graphql" %% "sangria"               % "2.0.0",
   "org.sangria-graphql" %% "sangria-circe"         % "1.3.0",
-  "org.slf4j"            % "slf4j-nop"             % "1.6.4"
+  "org.slf4j"            % "slf4j-nop"             % "1.6.4",
+  "eu.timepit"          %% "fs2-cron-cron4s"       % "0.7.2",
+  "org.http4s"          %% "http4s-blaze-client"   % "0.23.11",
+  "org.http4s"          %% "http4s-blaze-server"   % "0.23.11"
 )
