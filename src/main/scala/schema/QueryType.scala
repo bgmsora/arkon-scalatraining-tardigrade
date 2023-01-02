@@ -6,11 +6,27 @@ package demo.schema
 
 import cats.effect.Async
 import cats.effect.std.Dispatcher
-import sangria.schema.{ fields, Argument, Field, ListType, ObjectType, OptionType, Schema, StringType, IDType}
+import sangria.schema.{
+  fields,
+  Argument,
+  Field,
+  FloatType,
+  IDType,
+  IntType,
+  ListType,
+  ObjectType,
+  OptionType,
+  Schema,
+  StringType
+}
 import demo.repo.MasterRepo
 
 object QueryType {
-  val Id = Argument("id", StringType)
+  val Id        = Argument("id", StringType)
+  val Longitude = Argument("longitude", FloatType)
+  val Latitude  = Argument("latitude", FloatType)
+  val Radius    = Argument("radius", IntType, defaultValue = 10)
+  val Limit     = Argument("limit", IntType, defaultValue = 50)
 
   def apply[F[_]: Async](dispatcher: Dispatcher[F]): ObjectType[MasterRepo[F], Unit] =
     ObjectType(
@@ -52,13 +68,29 @@ object QueryType {
         Field(
           name      = "shopById",
           fieldType = OptionType(ShopType[F](dispatcher)),
-          resolve = c => dispatcher.unsafeToFuture(c.ctx.shop.fetchById(c arg Id)),
+          resolve   = c => dispatcher.unsafeToFuture(c.ctx.shop.fetchById(c arg Id)),
           arguments = List(Id)
         ),
         Field(
           name      = "shops",
           fieldType = ListType(ShopType[F](dispatcher)),
           resolve   = c => dispatcher.unsafeToFuture(c.ctx.shop.fetchAll)
+        ),
+        Field(
+          name      = "nearbyShops",
+          fieldType = ListType(ShopType[F](dispatcher)),
+          Some("Returns nearby shops within the given coordinates, if any exists."),
+          resolve = c =>
+            dispatcher.unsafeToFuture(c.ctx.shop.filterByCoordinates(c arg Longitude, c arg Latitude, c arg Limit)),
+          arguments = List(Longitude, Latitude, Limit)
+        ),
+        Field(
+          name      = "shopsInRadius",
+          fieldType = ListType(ShopType[F](dispatcher)),
+          Some("Returns shops within the given coordinates and radius, if any exists."),
+          resolve =
+            c => dispatcher.unsafeToFuture(c.ctx.shop.filterByRadius(c arg Longitude, c arg Latitude, c arg Radius)),
+          arguments = List(Longitude, Latitude, Radius)
         )
       )
     )

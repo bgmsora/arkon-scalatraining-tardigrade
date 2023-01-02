@@ -39,6 +39,7 @@ CREATE TABLE shop (
 
 --Datos para probar
 INSERT INTO comercial_activity  (id,"name") VALUES
+     (1,'Test '),
 	 (112311,'Explotación de gallinas para la producción de huevo fértil '),
 	 (112312,'Explotación de gallinas para la producción de huevo para plato '),
 	 (11232,'Explotación de pollos para la producción de carne'),
@@ -58,4 +59,4 @@ INSERT INTO shop_type (id,"name") VALUES
     (2,'Consultorios dentales del sector privado'),
     (3,'otro');
 INSERT INTO shop (id,"name","business_name","activity_id","stratum_id","address","phone_number","email","website","shop_type_id","position") VALUES
-    (34186,'ConsultorioDentalSinNombre','Consultorios dentales del sector privado',112311,1,'AGUASCALIENTES, Aguascalientes, AGUASCALIENTES','4499137286','example@gmail.com','abc.com', 1, ST_GeomFromText('POINT(-71.060316 48.432044)', 4326));
+    (34186,'ConsultorioDentalSinNombre','Consultorios dentales del sector privado',112311,1,'AGUASCALIENTES, Aguascalientes, AGUASCALIENTES','4499137286','example@gmail.com','abc.com', 1, ST_MakePoint(19.432406173983384, -99.13364393069804)::geography);

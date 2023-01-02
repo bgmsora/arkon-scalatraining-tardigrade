@@ -18,6 +18,7 @@ import demo.model.ShopType
 trait ShopTypeRepo[F[_]] {
   def fetchAll: F[List[ShopType]]
   def fetchById(id: String): F[Option[ShopType]]
+  def exists(id: Int): F[Boolean]
 }
 
 object ShopTypeRepo {
@@ -39,5 +40,15 @@ object ShopTypeRepo {
           .query[ShopType]
           .option
           .transact(xa)
+
+      def exists(id: Int): F[Boolean] = {
+        val selectExists = sql"""
+  				select exists(
+						select id from shop_type where id = $id
+					)
+				"""
+
+        selectExists.query[Boolean].unique.transact(xa)
+      }
     }
 }

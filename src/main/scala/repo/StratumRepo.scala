@@ -17,6 +17,7 @@ import demo.model.Stratum
 trait StratumRepo[F[_]] {
   def fetchAll: F[List[Stratum]]
   def fetchById(id: String): F[Option[Stratum]]
+  def exists(id: Int): F[Boolean]
 }
 
 object StratumRepo {
@@ -38,5 +39,15 @@ object StratumRepo {
           .query[Stratum]
           .option
           .transact(xa)
+
+      def exists(id: Int): F[Boolean] = {
+        val selectExists = sql"""
+  				select exists(
+						select id from stratum where id = $id
+					)
+				"""
+
+        selectExists.query[Boolean].unique.transact(xa)
+      }
     }
 }

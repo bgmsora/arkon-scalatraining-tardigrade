@@ -101,3 +101,39 @@ query{
     website
   }
 }
+
+//NearbyShops 
+query{
+  nearbyShops(latitude:19.4324, longitude:-80.8663, limit:3){
+    name
+  }
+}
+
+//shopsInRadius
+query{
+  shopsInRadius(latitude:-99.196237, longitude:19.49, radius:50000){
+    name
+  }
+}
+
+//////////Mutation////////
+mutation CreateShop(
+  $shopInput: ShopInput!) {
+  createShop(input: $shopInput) 
+}
+{
+  "shopInput": {
+    "id": 3418,
+    "activityId": 1,
+    "shopTypeId": 1,
+    "stratumId": 1,
+    "name": "Asereje",
+    "businessName": "123",
+    "address": "Azcapotzalco",
+    "phoneNumber": "123123",
+    "website": "asdas.com",
+    "lat": 19.491610160571422,
+    "long": -99.19624704525096,
+    "email": "asdasda@gmail.com"
+  }
+}

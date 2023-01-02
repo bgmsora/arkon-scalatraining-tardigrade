@@ -13,6 +13,8 @@ import demo.model.Activity
 trait ActivityRepo[F[_]] {
   def fetchAll: F[List[Activity]]
   def fetchById(id: String): F[Option[Activity]]
+  def exists(id: Int): F[Boolean]
+
 }
 
 object ActivityRepo {
@@ -34,5 +36,15 @@ object ActivityRepo {
           .query[Activity]
           .option
           .transact(xa)
+
+      def exists(id: Int): F[Boolean] = {
+        val selectExists = sql"""
+  				select exists(
+						select id from comercial_activity where id = $id
+					)
+				"""
+
+        selectExists.query[Boolean].unique.transact(xa)
+      }
     }
 }

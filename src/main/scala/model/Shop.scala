@@ -5,7 +5,7 @@
 package demo.model
 
 final case class Shop(
-  id: String,
+  id: Int,
   address: String,
   businessName: String,
   email: String,
@@ -14,7 +14,7 @@ final case class Shop(
   name: String,
   phoneNumber: String,
   website: String,
-  activityId: String,
-  shopTypeId: String,
-  stratumId: String
+  activityId: Int,
+  shopTypeId: Int,
+  stratumId: Int
 )

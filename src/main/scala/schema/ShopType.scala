@@ -12,70 +12,71 @@ import demo.model.Shop
 import demo.repo.MasterRepo
 
 object ShopType {
+
   def apply[F[_]: Async](dispatcher: Dispatcher[F]): ObjectType[MasterRepo[F], Shop] =
     ObjectType(
       name = "Shop",
       fieldsFn = () =>
         fields(
           Field(
-            name = "id",
-            fieldType = IDType,
-            resolve = _.value.id
+            name      = "id",
+            fieldType = IntType,
+            resolve   = _.value.id
           ),
           Field(
-            name = "address",
+            name      = "address",
             fieldType = StringType,
-            resolve = _.value.address
+            resolve   = _.value.address
           ),
           Field(
-            name = "businessName",
+            name      = "businessName",
             fieldType = OptionType(StringType),
-            resolve = _.value.businessName
+            resolve   = _.value.businessName
           ),
           Field(
-            name = "email",
+            name      = "email",
             fieldType = OptionType(StringType),
-            resolve = _.value.email
+            resolve   = _.value.email
           ),
           Field(
-            name = "lat",
+            name      = "lat",
             fieldType = FloatType,
-            resolve = _.value.lat
+            resolve   = _.value.lat
           ),
           Field(
-            name = "long",
+            name      = "long",
             fieldType = FloatType,
-            resolve = _.value.long
+            resolve   = _.value.long
           ),
           Field(
-            name = "name",
+            name      = "name",
             fieldType = StringType,
-            resolve = _.value.name
+            resolve   = _.value.name
           ),
           Field(
-            name = "phoneNumber",
+            name      = "phoneNumber",
             fieldType = OptionType(StringType),
-            resolve = _.value.phoneNumber
+            resolve   = _.value.phoneNumber
           ),
           Field(
-            name = "website",
+            name      = "website",
             fieldType = OptionType(StringType),
-            resolve = _.value.website
+            resolve   = _.value.website
           ),
           Field(
-            name = "activity",
+            name      = "activity",
             fieldType = OptionType(ActivityType[F]),
-            resolve   = c => dispatcher.unsafeToFuture(c.ctx.activity.fetchById(c.value.activityId))
+            resolve   = c => dispatcher.unsafeToFuture(c.ctx.activity.fetchById(c.value.activityId.toString))
           ),
           Field(
-            name = "shopType",
+            name      = "shopType",
             fieldType = OptionType(ShopTypeType[F]),
-            resolve = c => dispatcher.unsafeToFuture(c.ctx.shopType.fetchById(c.value.shopTypeId))
+            resolve   = c => dispatcher.unsafeToFuture(c.ctx.shopType.fetchById(c.value.shopTypeId.toString))
           ),
           Field(
-            name = "stratum",
+            name      = "stratum",
             fieldType = OptionType(StratumType[F]),
-            resolve = c => dispatcher.unsafeToFuture(c.ctx.stratum.fetchById(c.value.stratumId))
+            resolve   = c => dispatcher.unsafeToFuture(c.ctx.stratum.fetchById(c.value.stratumId.toString))
           )
         )
     )

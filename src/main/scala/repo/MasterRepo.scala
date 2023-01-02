@@ -11,7 +11,7 @@ final case class MasterRepo[F[_]](
   activity: ActivityRepo[F],
   shopType: ShopTypeRepo[F],
   stratum: StratumRepo[F],
-  shop: ShopRepo[F],
+  shop: ShopRepo[F]
 )
 
 object MasterRepo {
@@ -21,6 +21,6 @@ object MasterRepo {
       ActivityRepo.fromTransactor(xa),
       ShopTypeRepo.fromTransactor(xa),
       StratumRepo.fromTransactor(xa),
-      ShopRepo.fromTransactor(xa),
+      ShopRepo.fromTransactor(xa)
     )
 }
