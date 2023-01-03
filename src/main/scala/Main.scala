@@ -24,6 +24,8 @@ import org.http4s.server._
 
 import org.http4s.blaze.client.BlazeClientBuilder
 
+import demo.Retrieve
+
 object Main extends IOApp {
   //Add
   implicit val executionContext = unsafe.IORuntime.global.compute
@@ -61,6 +63,8 @@ object Main extends IOApp {
           case Right(json) => Ok(json)
           case Left(json)  => BadRequest(json)
         }
+      case request @ GET -> Root / "retrieve" / lat / lon => 
+        Ok(Retrieve.postToInegi(lat,lon))
     }
   }
 
