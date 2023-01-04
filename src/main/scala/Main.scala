@@ -23,7 +23,7 @@ import org.http4s.ember.server._
 import org.http4s.server._
 
 import org.http4s.blaze.client.BlazeClientBuilder
-
+import cats.effect.unsafe.implicits.global
 import demo.Retrieve
 
 object Main extends IOApp {
@@ -64,7 +64,7 @@ object Main extends IOApp {
           case Left(json)  => BadRequest(json)
         }
       case request @ GET -> Root / "retrieve" / lat / lon => 
-        Ok(Retrieve.postToInegi(lat,lon))
+        Ok(Retrieve.postToInegi(lat,lon).unsafeRunSync)
     }
   }
 
