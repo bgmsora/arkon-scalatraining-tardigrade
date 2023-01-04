@@ -54,7 +54,7 @@ object Main extends IOApp {
   def graphRoutes[F[_]: Async](graph: WorldDeferredResolver[F]): HttpRoutes[F] = {
     object Dsl extends Http4sDsl[F]
     import Dsl._
-
+    val retrieve = new Retrieve[F]
     HttpRoutes.of[F] {
       case request @ GET -> Root / "graph" =>
         StaticFile fromResource ("/assets/playground.html", Some(request)) getOrElseF (NotFound())
@@ -64,7 +64,7 @@ object Main extends IOApp {
           case Left(json)  => BadRequest(json)
         }
       case request @ GET -> Root / "retrieve" / lat / lon => 
-        Ok(Retrieve.postToInegi(lat,lon).unsafeRunSync)
+        retrieve.postToInegi(lat,lon).flatMap(Ok(_))
     }
   }
 
