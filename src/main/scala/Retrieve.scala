@@ -95,7 +95,13 @@ class Retrieve[F[_]: Async] {
       HttpVersion.`HTTP/2.0`,
       Headers(Header("Content-Type", "application/json"))
     ).withBodyStream(fs2.Stream.emit(rawJson).through(fs2.text.encode(charset.Charset.forName("UTF-8"))))
-    Async[F].delay(println("Sent to graphql")) *>
-    client.expect[String](a)
+
+    for {
+      _ <- Async[F].delay(println("Sent to graphql"))
+      result <-
+        client
+          .expect[String](a)
+          .handleErrorWith(e => Async[F].delay(println(s"${e.getMessage()} Error al enviar post a graphql")) *> Async[F].raiseError(e))
+    } yield result
   }
 }
