@@ -65,7 +65,9 @@ class Retrieve[F[_]: Async] {
     println(shop.Estrato)
     println(shop.Tipo)
     println(shop.Clase_actividad)
-    val rawJson = s"""{
+    val rawJson = s"""
+        {
+          "operationName":"CreateShop",
           "query": "mutation CreateShop( $$shopInput: ShopInput!) { createShop(input: $$shopInput) }",
 					"variables": {
             "shopInput": {
@@ -87,14 +89,18 @@ class Retrieve[F[_]: Async] {
     println(rawJson)
     println("raw")
 
+    val json: Json = parse(rawJson).getOrElse(Json.Null)
+
     val a = Request[F](
       method = Method.POST,
       uri = Uri.uri(
         "http://localhost:8080/graph"
+        //"http://localhost:8081/test"
       ),
       HttpVersion.`HTTP/2.0`,
       Headers(Header("Content-Type", "application/json"))
-    ).withBodyStream(fs2.Stream.emit(rawJson).through(fs2.text.encode(charset.Charset.forName("UTF-8"))))
+    //).withBodyStream(fs2.Stream.emit(rawJson).through(fs2.text.encode(charset.Charset.forName("UTF-8"))))  
+    ).withEntity(json)
 
     for {
       _ <- Async[F].delay(println("Sent to graphql"))
@@ -102,6 +108,7 @@ class Retrieve[F[_]: Async] {
         client
           .expect[String](a)
           .handleErrorWith(e => Async[F].delay(println(s"${e.getMessage()} Error al enviar post a graphql")) *> Async[F].raiseError(e))
+      _ <- Async[F].delay(println(s"respuesta del servidor $result"))
     } yield result
   }
 }
